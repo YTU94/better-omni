@@ -72,6 +72,15 @@ class ChromeService {
       console.error('Error opening bookmark:', error);
     }
   }
+
+  async closeTab(tabId: number): Promise<void> {
+    try {
+      await chrome.tabs.remove(tabId);
+    } catch (error) {
+      console.error('Error closing tab:', error);
+      throw error;
+    }
+  }
 }
 
 export const chromeService = new ChromeService();

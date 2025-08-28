@@ -4,10 +4,11 @@ interface SearchResultsProps {
   results: SearchResult[]
   selectedIndex: number
   onSelectResult: (result: SearchResult) => void
+  onCloseTab?: (tabId: number) => void
   query: string
 }
 
-export function SearchResults({ results, selectedIndex, onSelectResult, query }: SearchResultsProps) {
+export function SearchResults({ results, selectedIndex, onSelectResult, onCloseTab, query }: SearchResultsProps) {
   if (query.trim() && results.length === 0) {
     return (
       <div className="search-results">
@@ -42,6 +43,7 @@ export function SearchResults({ results, selectedIndex, onSelectResult, query }:
           result={result}
           isSelected={index === selectedIndex}
           onClick={() => onSelectResult(result)}
+          onCloseTab={onCloseTab}
           query={query}
         />
       ))}
@@ -53,10 +55,11 @@ interface SearchResultItemProps {
   result: SearchResult
   isSelected: boolean
   onClick: () => void
+  onCloseTab?: (tabId: number) => void
   query: string
 }
 
-function SearchResultItem({ result, isSelected, onClick, query }: SearchResultItemProps) {
+function SearchResultItem({ result, isSelected, onClick, onCloseTab, query }: SearchResultItemProps) {
   const getIcon = (result: SearchResult) => {
     if (result.type === 'tab') {
       const tab = result.data as TabInfo
@@ -79,6 +82,14 @@ function SearchResultItem({ result, isSelected, onClick, query }: SearchResultIt
 
   const getTypeLabel = (result: SearchResult) => {
     return result.type === 'tab' ? 'Tab' : 'Bookmark'
+  }
+
+  const handleCloseClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (result.type === 'tab' && onCloseTab) {
+      const tab = result.data as TabInfo
+      onCloseTab(tab.id)
+    }
   }
 
   const highlightMatch = (text: string, query: string) => {
@@ -104,6 +115,16 @@ function SearchResultItem({ result, isSelected, onClick, query }: SearchResultIt
         <div className="result-url">{getUrl(result)}</div>
       </div>
       <div className="result-type">{getTypeLabel(result)}</div>
+      {result.type === 'tab' && onCloseTab && (
+        <button 
+          className="close-tab-button"
+          onClick={handleCloseClick}
+          title="Close tab"
+          aria-label="Close tab"
+        >
+          ×
+        </button>
+      )}
     </div>
   )
 }

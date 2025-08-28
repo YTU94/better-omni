@@ -95,6 +95,16 @@ export function SearchInterface() {
     await loadInitialData()
   }
 
+  const handleCloseTab = async (tabId: number) => {
+    try {
+      await chromeService.closeTab(tabId)
+      // Refresh the tab list after closing
+      await loadInitialData()
+    } catch (error) {
+      console.error('Error closing tab:', error)
+    }
+  }
+
   return (
     <div className="search-interface">
       <div className="search-header">
@@ -116,6 +126,7 @@ export function SearchInterface() {
         results={results}
         selectedIndex={selectedIndex}
         onSelectResult={handleSelectResult}
+        onCloseTab={handleCloseTab}
         query={query}
       />
     </div>

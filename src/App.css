@@ -49,6 +49,7 @@
   width: 100%;
   padding: 14px 44px 14px 18px;
   font-size: 16px;
+  color: #171A1D;
   border: 1px solid #d0d7de;
   border-radius: 12px;
   outline: none;
@@ -234,6 +235,41 @@
   flex-shrink: 0;
   font-weight: 500;
   letter-spacing: 0.5px;
+}
+
+.close-tab-button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #656d76;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-left: 12px;
+  opacity: 0;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.search-result-item:hover .close-tab-button,
+.search-result-item.selected .close-tab-button {
+  opacity: 1;
+}
+
+.close-tab-button:hover {
+  background: rgba(255, 59, 48, 0.1);
+  color: #ff3b30;
+}
+
+.close-tab-button:active {
+  background: rgba(255, 59, 48, 0.2);
+  transform: scale(0.9);
 }
 
 @keyframes spin {
