@@ -1,7 +1,109 @@
 import type { TabInfo, BookmarkInfo } from '../types';
 
+// Mock data for development
+const MOCK_TABS: TabInfo[] = [
+  {
+    id: 1,
+    title: 'GitHub - facebook/react: The library for web and native user interfaces.',
+    url: 'https://github.com/facebook/react',
+    favIconUrl: 'https://github.githubassets.com/favicons/favicon.svg',
+    windowId: 1,
+    index: 0,
+    pinned: false,
+    highlighted: true
+  },
+  {
+    id: 2,
+    title: 'Google', 
+    url: 'https://www.google.com',
+    favIconUrl: 'https://www.google.com/favicon.ico',
+    windowId: 1,
+    index: 1,
+    pinned: false,
+    highlighted: false
+  },
+  {
+    id: 3,
+    title: 'Stack Overflow - Where Developers Learn, Share, & Build Careers',
+    url: 'https://stackoverflow.com',
+    favIconUrl: 'https://cdn.sstatic.net/Sites/stackoverflow/Img/favicon.ico',
+    windowId: 1,
+    index: 2,
+    pinned: true,
+    highlighted: false
+  },
+  {
+    id: 4,
+    title: 'MDN Web Docs', 
+    url: 'https://developer.mozilla.org/en-US/',
+    // favIconUrl: 'https://developer.mozilla.org/favicon-48x48.cbbd161b.png',
+    windowId: 1,
+    index: 3,
+    pinned: false,
+    highlighted: false
+  },
+  {
+    id: 5,
+    title: 'npm', 
+    url: 'https://www.npmjs.com',
+    favIconUrl: 'https://static.npmjs.com/attachments/ck3uwe05o00eo3575jjd7fjaj-npm-logo.svg',
+    windowId: 1,
+    index: 4,
+    pinned: false,
+    highlighted: false
+  }
+];
+
+const MOCK_BOOKMARKS: BookmarkInfo[] = [
+  {
+    id: '1',
+    title: 'GitHub',
+    url: 'https://github.com',
+    dateAdded: Date.now(),
+    parentId: '0',
+    favIconUrl: 'https://github.githubassets.com/favicons/favicon.svg'
+  },
+  {
+    id: '2',
+    title: 'React Documentation',
+    url: 'https://react.dev',
+    dateAdded: Date.now(),
+    parentId: '0',
+    favIconUrl: 'https://react.dev/favicon.ico'
+  },
+  {
+    id: '3',
+    title: 'TypeScript Documentation',
+    url: 'https://www.typescriptlang.org',
+    dateAdded: Date.now(),
+    parentId: '0',
+    favIconUrl: 'https://www.typescriptlang.org/favicon-32x32.png'
+  },
+  {
+    id: '4',
+    title: 'Vite',
+    url: 'https://vitejs.dev',
+    dateAdded: Date.now(),
+    parentId: '0',
+    favIconUrl: 'https://vitejs.dev/logo.svg'
+  },
+  {
+    id: '5',
+    title: 'Chrome Extension Documentation',
+    url: 'https://developer.chrome.com/docs/extensions',
+    dateAdded: Date.now(),
+    parentId: '0',
+    favIconUrl: 'https://www.google.com/favicon.ico'
+  }
+];
+
 class ChromeService {
   async getAllTabs(): Promise<TabInfo[]> {
+    // Use mock data in development
+    if (import.meta.env.DEV) {
+      return new Promise(resolve => setTimeout(() => resolve(MOCK_TABS), 500));
+    }
+    
     try {
       const tabs = await chrome.tabs.query({});
       return tabs.map(tab => ({
@@ -21,6 +123,11 @@ class ChromeService {
   }
 
   async getAllBookmarks(): Promise<BookmarkInfo[]> {
+    // Use mock data in development
+    if (import.meta.env.DEV) {
+      return new Promise(resolve => setTimeout(() => resolve(MOCK_BOOKMARKS), 500));
+    }
+    
     try {
       const bookmarks = await chrome.bookmarks.getTree();
       return this.flattenBookmarks(bookmarks);

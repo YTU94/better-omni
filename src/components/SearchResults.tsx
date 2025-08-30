@@ -1,4 +1,5 @@
 import type { SearchResult, TabInfo, BookmarkInfo } from '../types'
+import { unknowImgUrl } from '@/assets/index'
 
 interface SearchResultsProps {
   results: SearchResult[]
@@ -63,10 +64,10 @@ function SearchResultItem({ result, isSelected, onClick, onCloseTab, query }: Se
   const getIcon = (result: SearchResult) => {
     if (result.type === 'tab') {
       const tab = result.data as TabInfo
-      return tab.favIconUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTggMTZDMTEuMzEzNyAxNiAxNCAxMy4zMTM3IDE0IDEwQzE0IDYuNjg2MjkgMTEuMzEzNyA0IDggNEM0LjY4NjI5IDQgMiA2LjY4NjI5IDIgMTBDMiAxMy4zMTM3IDQuNjg2MjkgMTYgOCAxNloiIGZpbGw9IiM2NjY2NjYiLz4KPC9zdmc+'
+      return tab.favIconUrl || unknowImgUrl
     } else {
       const bookmark = result.data as BookmarkInfo
-      return bookmark.favIconUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDRIMTBDMTAgMi45IDEwLjkgMiAxMiAySDE0QzE0LjYgMiAxNSAyLjQgMTUgM1YxM0MxNSAxMy42IDE0LjYgMTQgMTQgMTRIMTJDMTEuNCAxNCAxMSAxMy42IDExIDEzVjRIMTJ6TTQgMTJIMlY0SDRWMTJ6TTggMTJINlY0SDhWMTJ6IiBmaWxsPSIjNjY2NjY2Ii8+Cjwvc3ZnPg=='
+      return bookmark.favIconUrl || unknowImgUrl
     }
   }
 
