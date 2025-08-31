@@ -1,7 +1,7 @@
 .app {
   width: 700px;
   min-height: 650px;
-  max-height: 750px;
+  max-height: 80vh;
   background: #ffffff;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   color: #333;
@@ -9,6 +9,8 @@
   border-radius: 16px;
   overflow: hidden;
   position: relative;
+  margin: 0 auto;
+  overflow-y: scroll;
 }
 
 .search-interface {
