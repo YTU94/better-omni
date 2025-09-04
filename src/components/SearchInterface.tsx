@@ -20,22 +20,24 @@ export function SearchInterface() {
   }, [])
 
   useEffect(() => {
-    performSearch()
-  }, [query, tabs, bookmarks])
-
-  useEffect(() => {
     searchInputRef.current?.focus()
   }, [])
+
+  useEffect(() => {
+    performSearch()
+  }, [query, tabs, bookmarks])
 
   const loadInitialData = async () => {
     try {
       setIsLoading(true)
+      console.log('Loading initial data...')
       const [loadedTabs, loadedBookmarks] = await Promise.all([
         chromeService.getAllTabs(),
         chromeService.getAllBookmarks()
       ])
+      console.log('Loaded tabs:', loadedTabs)
+      console.log('Loaded bookmarks:', loadedBookmarks)
       setTabs(loadedTabs)
-      console.log("309595 ~ loadInitialData ~ loadedTabs:", loadedTabs);
       setBookmarks(loadedBookmarks)
     } catch (error) {
       console.error('Error loading data:', error)

@@ -13,7 +13,6 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_popup": "index.html",
     "default_title": "Quick Tab Launcher",
     "default_icon": {
       "16": "icon16.png",

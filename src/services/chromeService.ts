@@ -99,8 +99,9 @@ const MOCK_BOOKMARKS: BookmarkInfo[] = [
 
 class ChromeService {
   async getAllTabs(): Promise<TabInfo[]> {
-    // Use mock data in development
-    if (import.meta.env.DEV) {
+    // Check if we're in a Chrome extension environment
+    if (typeof chrome === 'undefined' || !chrome.tabs) {
+      // Use mock data if chrome API is not available
       return new Promise(resolve => setTimeout(() => resolve(MOCK_TABS), 500));
     }
     
@@ -118,13 +119,14 @@ class ChromeService {
       }));
     } catch (error) {
       console.error('Error getting tabs:', error);
-      return [];
+      return MOCK_TABS; // Fallback to mock data on error
     }
   }
 
   async getAllBookmarks(): Promise<BookmarkInfo[]> {
-    // Use mock data in development
-    if (import.meta.env.DEV) {
+    // Check if we're in a Chrome extension environment
+    if (typeof chrome === 'undefined' || !chrome.bookmarks) {
+      // Use mock data if chrome API is not available
       return new Promise(resolve => setTimeout(() => resolve(MOCK_BOOKMARKS), 500));
     }
     
@@ -133,7 +135,7 @@ class ChromeService {
       return this.flattenBookmarks(bookmarks);
     } catch (error) {
       console.error('Error getting bookmarks:', error);
-      return [];
+      return MOCK_BOOKMARKS; // Fallback to mock data on error
     }
   }
 
@@ -163,6 +165,11 @@ class ChromeService {
   }
 
   async switchToTab(tabId: number): Promise<void> {
+    if (typeof chrome === 'undefined' || !chrome.tabs) {
+      console.log('Chrome API not available, mock switch to tab:', tabId);
+      return;
+    }
+    
     try {
       await chrome.tabs.update(tabId, { active: true });
       const tab = await chrome.tabs.get(tabId);
@@ -173,6 +180,11 @@ class ChromeService {
   }
 
   async openBookmark(url: string): Promise<void> {
+    if (typeof chrome === 'undefined' || !chrome.tabs) {
+      console.log('Chrome API not available, mock open bookmark:', url);
+      return;
+    }
+    
     try {
       await chrome.tabs.create({ url });
     } catch (error) {
@@ -181,6 +193,11 @@ class ChromeService {
   }
 
   async closeTab(tabId: number): Promise<void> {
+    if (typeof chrome === 'undefined' || !chrome.tabs) {
+      console.log('Chrome API not available, mock close tab:', tabId);
+      return;
+    }
+    
     try {
       await chrome.tabs.remove(tabId);
     } catch (error) {
