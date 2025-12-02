@@ -23,7 +23,27 @@ const MOCK_TABS: TabInfo[] = [
     highlighted: false
   },
   {
+    id: 22,
+    title: 'Google', 
+    url: 'https://www.google.com',
+    favIconUrl: 'https://www.google.com/favicon.ico',
+    windowId: 1,
+    index: 1,
+    pinned: false,
+    highlighted: false
+  },
+  {
     id: 3,
+    title: 'Stack Overflow - Where Developers Learn, Share, & Build Careers',
+    url: 'https://stackoverflow.com',
+    favIconUrl: 'https://cdn.sstatic.net/Sites/stackoverflow/Img/favicon.ico',
+    windowId: 1,
+    index: 2,
+    pinned: true,
+    highlighted: false
+  },
+  {
+    id: 33,
     title: 'Stack Overflow - Where Developers Learn, Share, & Build Careers',
     url: 'https://stackoverflow.com',
     favIconUrl: 'https://cdn.sstatic.net/Sites/stackoverflow/Img/favicon.ico',

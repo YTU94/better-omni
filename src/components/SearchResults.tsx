@@ -1,15 +1,17 @@
 import type { SearchResult, TabInfo, BookmarkInfo } from '../types'
 import { unknowImgUrl } from '@/assets/index'
+import { useMemo } from 'react'
 
 interface SearchResultsProps {
   results: SearchResult[]
   selectedIndex: number
   onSelectResult: (result: SearchResult) => void
   onCloseTab?: (tabId: number) => void
+  onCloseMultipleTabs?: (tabIds: number[]) => void
   query: string
 }
 
-export function SearchResults({ results, selectedIndex, onSelectResult, onCloseTab, query }: SearchResultsProps) {
+export function SearchResults({ results, selectedIndex, onSelectResult, onCloseTab, onCloseMultipleTabs, query }: SearchResultsProps) {
   if (query.trim() && results.length === 0) {
     return (
       <div className="search-results">
@@ -18,6 +20,38 @@ export function SearchResults({ results, selectedIndex, onSelectResult, onCloseT
         </div>
       </div>
     )
+  }
+
+  // Detect duplicate tabs based on URL
+  const duplicateTabs = useMemo(() => {
+    const tabResults = results.filter(r => r.type === 'tab') as Array<{ type: 'tab', data: TabInfo }>
+    const urlMap = new Map<string, number[]>()
+
+    tabResults.forEach(result => {
+      const url = result.data.url
+      if (urlMap.has(url)) {
+        urlMap.get(url)!.push(result.data.id)
+      } else {
+        urlMap.set(url, [result.data.id])
+      }
+    })
+
+    // Filter to only get URLs with duplicates (keeping the first one, removing others)
+    const duplicates: number[] = []
+    urlMap.forEach(tabIds => {
+      if (tabIds.length > 1) {
+        // Keep the first tab, close the rest
+        duplicates.push(...tabIds.slice(1))
+      }
+    })
+
+    return duplicates
+  }, [results])
+
+  const handleDeleteDuplicates = () => {
+    if (onCloseMultipleTabs && duplicateTabs.length > 0) {
+      onCloseMultipleTabs(duplicateTabs)
+    }
   }
 
   if (results.length === 0 && !query.trim()) {
@@ -37,17 +71,34 @@ export function SearchResults({ results, selectedIndex, onSelectResult, onCloseT
   }
 
   return (
-    <div className="search-results">
-      {results.map((result, index) => (
-        <SearchResultItem
-          key={`${result.type}-${result.data.id}`}
-          result={result}
-          isSelected={index === selectedIndex}
-          onClick={() => onSelectResult(result)}
-          onCloseTab={onCloseTab}
-          query={query}
-        />
-      ))}
+    <div className="search-results-container">
+      <div className="search-results">
+        {results.map((result, index) => (
+          <SearchResultItem
+            key={`${result.type}-${result.data.id}`}
+            result={result}
+            isSelected={index === selectedIndex}
+            onClick={() => onSelectResult(result)}
+            onCloseTab={onCloseTab}
+            query={query}
+          />
+        ))}
+      </div>
+
+      {duplicateTabs.length > 0 && (
+        <div className="action-bar">
+          <div className="action-info">
+            发现 {duplicateTabs.length} 个重复标签页
+          </div>
+          <button
+            className="action-button"
+            onClick={handleDeleteDuplicates}
+            title="一键删除所有重复的Chrome标签页"
+          >
+            删除重复标签
+          </button>
+        </div>
+      )}
     </div>
   )
 }

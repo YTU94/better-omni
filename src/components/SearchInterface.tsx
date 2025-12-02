@@ -107,6 +107,17 @@ export function SearchInterface() {
     }
   }
 
+  const handleCloseMultipleTabs = async (tabIds: number[]) => {
+    try {
+      // Close all tabs in parallel
+      await Promise.all(tabIds.map(id => chromeService.closeTab(id)))
+      // Refresh the tab list after closing
+      await loadInitialData()
+    } catch (error) {
+      console.error('Error closing multiple tabs:', error)
+    }
+  }
+
   return (
     <div className="search-interface">
       <div className="search-header">
@@ -129,6 +140,7 @@ export function SearchInterface() {
         selectedIndex={selectedIndex}
         onSelectResult={handleSelectResult}
         onCloseTab={handleCloseTab}
+        onCloseMultipleTabs={handleCloseMultipleTabs}
         query={query}
       />
     </div>
