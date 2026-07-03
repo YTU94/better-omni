@@ -25,3 +25,9 @@ dist.*
 *.sw?
 
 IFLOW.md
+
+# Local AI tooling configs
+.agents/
+.claude/
+.codex/
+.cursor/

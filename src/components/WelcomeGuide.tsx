@@ -7,12 +7,10 @@ interface WelcomeGuideProps {
 
 export function WelcomeGuide({ onComplete }: WelcomeGuideProps) {
   const [shortcut, setShortcut] = useState('Cmd+Shift+K');
-  const [isMac, setIsMac] = useState(true);
 
   useEffect(() => {
     // 检测操作系统
     const platform = navigator.platform.toLowerCase();
-    setIsMac(platform.includes('mac'));
     setShortcut(platform.includes('mac') ? 'Cmd+Shift+K' : 'Ctrl+Shift+K');
   }, []);
 

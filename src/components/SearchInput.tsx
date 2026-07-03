@@ -7,6 +7,8 @@ interface SearchInputProps {
   placeholder?: string
   isLoading?: boolean
   onRefresh?: () => void
+  statsLabel?: string
+  statsTitle?: string
 }
 
 export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(({
@@ -15,7 +17,9 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(({
   onKeyDown,
   placeholder = 'Search...',
   isLoading = false,
-  onRefresh
+  onRefresh,
+  statsLabel,
+  statsTitle
 }, ref) => {
   return (
     <div className="search-input-container">
@@ -32,6 +36,11 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(({
         />
         <div className="search-actions">
           {isLoading && <div className="loading-spinner">⟳</div>}
+          {statsLabel && (
+            <div className="search-inline-stats" title={statsTitle}>
+              {statsLabel}
+            </div>
+          )}
           {onRefresh && (
             <button 
               className="refresh-button" 

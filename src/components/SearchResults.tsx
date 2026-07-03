@@ -8,20 +8,21 @@ interface SearchResultsProps {
   onSelectResult: (result: SearchResult) => void
   onCloseTab?: (tabId: number) => void
   onCloseMultipleTabs?: (tabIds: number[]) => void
+  onToggleBookmark?: (result: SearchResult) => void
+  isBookmarked?: (result: SearchResult) => boolean
   query: string
 }
 
-export function SearchResults({ results, selectedIndex, onSelectResult, onCloseTab, onCloseMultipleTabs, query }: SearchResultsProps) {
-  if (query.trim() && results.length === 0) {
-    return (
-      <div className="search-results">
-        <div className="no-results">
-          No results found for "{query}"
-        </div>
-      </div>
-    )
-  }
-
+export function SearchResults({
+  results,
+  selectedIndex,
+  onSelectResult,
+  onCloseTab,
+  onCloseMultipleTabs,
+  onToggleBookmark,
+  isBookmarked,
+  query
+}: SearchResultsProps) {
   // Detect duplicate tabs based on URL
   const duplicateTabs = useMemo(() => {
     const tabResults = results.filter(r => r.type === 'tab') as Array<{ type: 'tab', data: TabInfo }>
@@ -48,6 +49,16 @@ export function SearchResults({ results, selectedIndex, onSelectResult, onCloseT
     return duplicates
   }, [results])
 
+  if (query.trim() && results.length === 0) {
+    return (
+      <div className="search-results">
+        <div className="no-results">
+          No results found for "{query}"
+        </div>
+      </div>
+    )
+  }
+
   const handleDeleteDuplicates = () => {
     if (onCloseMultipleTabs && duplicateTabs.length > 0) {
       onCloseMultipleTabs(duplicateTabs)
@@ -71,7 +82,7 @@ export function SearchResults({ results, selectedIndex, onSelectResult, onCloseT
   }
 
   return (
-    <div className="search-results-container">
+    <div className={`search-results-container ${duplicateTabs.length > 0 ? 'has-action-bar' : ''}`}>
       <div className="search-results">
         {results.map((result, index) => (
           <SearchResultItem
@@ -80,6 +91,8 @@ export function SearchResults({ results, selectedIndex, onSelectResult, onCloseT
             isSelected={index === selectedIndex}
             onClick={() => onSelectResult(result)}
             onCloseTab={onCloseTab}
+            onToggleBookmark={onToggleBookmark}
+            isBookmarked={isBookmarked?.(result) ?? result.type === 'bookmark'}
             query={query}
           />
         ))}
@@ -108,10 +121,20 @@ interface SearchResultItemProps {
   isSelected: boolean
   onClick: () => void
   onCloseTab?: (tabId: number) => void
+  onToggleBookmark?: (result: SearchResult) => void
+  isBookmarked: boolean
   query: string
 }
 
-function SearchResultItem({ result, isSelected, onClick, onCloseTab, query }: SearchResultItemProps) {
+function SearchResultItem({
+  result,
+  isSelected,
+  onClick,
+  onCloseTab,
+  onToggleBookmark,
+  isBookmarked,
+  query
+}: SearchResultItemProps) {
   const getIcon = (result: SearchResult) => {
     if (result.type === 'tab') {
       const tab = result.data as TabInfo
@@ -144,6 +167,11 @@ function SearchResultItem({ result, isSelected, onClick, onCloseTab, query }: Se
     }
   }
 
+  const handleBookmarkClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onToggleBookmark?.(result)
+  }
+
   const highlightMatch = (text: string, query: string) => {
     if (!query.trim()) return text
     
@@ -166,6 +194,23 @@ function SearchResultItem({ result, isSelected, onClick, onCloseTab, query }: Se
         />
         <div className="result-url">{getUrl(result)}</div>
       </div>
+      {onToggleBookmark && (
+        <button
+          className={`bookmark-button ${isBookmarked ? 'bookmarked' : ''}`}
+          onClick={handleBookmarkClick}
+          title={isBookmarked ? '删除书签' : '添加书签'}
+          aria-label={isBookmarked ? '删除书签' : '添加书签'}
+          aria-pressed={isBookmarked}
+        >
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            className="bookmark-icon"
+          >
+            <path d="M6 3.75A1.75 1.75 0 0 1 7.75 2h8.5A1.75 1.75 0 0 1 18 3.75v17.06a.75.75 0 0 1-1.18.61L12 18.06l-4.82 3.36A.75.75 0 0 1 6 20.81V3.75Z" />
+          </svg>
+        </button>
+      )}
       <div className="result-type">{getTypeLabel(result)}</div>
       {result.type === 'tab' && onCloseTab && (
         <button 

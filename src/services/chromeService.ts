@@ -74,7 +74,7 @@ const MOCK_TABS: TabInfo[] = [
   }
 ];
 
-const MOCK_BOOKMARKS: BookmarkInfo[] = [
+let MOCK_BOOKMARKS: BookmarkInfo[] = [
   {
     id: '1',
     title: 'GitHub',
@@ -222,6 +222,49 @@ class ChromeService {
       await chrome.tabs.remove(tabId);
     } catch (error) {
       console.error('Error closing tab:', error);
+      throw error;
+    }
+  }
+
+  async addBookmark(title: string, url: string): Promise<BookmarkInfo> {
+    if (typeof chrome === 'undefined' || !chrome.bookmarks) {
+      const bookmark: BookmarkInfo = {
+        id: `mock-${Date.now()}`,
+        title,
+        url,
+        dateAdded: Date.now(),
+        parentId: '0'
+      };
+      MOCK_BOOKMARKS = [...MOCK_BOOKMARKS, bookmark];
+      return bookmark;
+    }
+
+    try {
+      const bookmark = await chrome.bookmarks.create({ title, url });
+      return {
+        id: bookmark.id,
+        title: bookmark.title || title,
+        url: bookmark.url,
+        dateAdded: bookmark.dateAdded,
+        parentId: bookmark.parentId,
+        favIconUrl: bookmark.url ? `chrome://favicon/${bookmark.url}` : undefined
+      };
+    } catch (error) {
+      console.error('Error adding bookmark:', error);
+      throw error;
+    }
+  }
+
+  async removeBookmark(bookmarkId: string): Promise<void> {
+    if (typeof chrome === 'undefined' || !chrome.bookmarks) {
+      MOCK_BOOKMARKS = MOCK_BOOKMARKS.filter(bookmark => bookmark.id !== bookmarkId);
+      return;
+    }
+
+    try {
+      await chrome.bookmarks.remove(bookmarkId);
+    } catch (error) {
+      console.error('Error removing bookmark:', error);
       throw error;
     }
   }

@@ -15,6 +15,18 @@ export function SearchInterface() {
   
   const searchInputRef = useRef<HTMLInputElement>(null)
 
+  const performSearch = useCallback(() => {
+    if (!query.trim()) {
+      const tabResults = searchEngine.searchTabs(tabs, '')
+      setResults(tabResults)
+    } else {
+      const tabResults = searchEngine.searchTabs(tabs, query)
+      const bookmarkResults = searchEngine.searchBookmarks(bookmarks, query)
+      setResults([...tabResults, ...bookmarkResults])
+    }
+    setSelectedIndex(0)
+  }, [query, tabs, bookmarks])
+
   useEffect(() => {
     loadInitialData()
   }, [])
@@ -25,7 +37,7 @@ export function SearchInterface() {
 
   useEffect(() => {
     performSearch()
-  }, [query, tabs, bookmarks])
+  }, [performSearch])
 
   const loadInitialData = async () => {
     try {
@@ -45,18 +57,6 @@ export function SearchInterface() {
       setIsLoading(false)
     }
   }
-
-  const performSearch = useCallback(() => {
-    if (!query.trim()) {
-      const tabResults = searchEngine.searchTabs(tabs, '')
-      setResults(tabResults)
-    } else {
-      const tabResults = searchEngine.searchTabs(tabs, query)
-      const bookmarkResults = searchEngine.searchBookmarks(bookmarks, query)
-      setResults([...tabResults, ...bookmarkResults])
-    }
-    setSelectedIndex(0)
-  }, [query, tabs, bookmarks])
 
   const handleKeyDown = useCallback(async (event: React.KeyboardEvent) => {
     switch (event.key) {
@@ -118,6 +118,32 @@ export function SearchInterface() {
     }
   }
 
+  const findBookmarkForResult = (result: SearchResult) => {
+    if (result.type === 'bookmark') {
+      return result.data as BookmarkInfo
+    }
+
+    const tab = result.data as TabInfo
+    return bookmarks.find(bookmark => bookmark.url === tab.url)
+  }
+
+  const handleToggleBookmark = async (result: SearchResult) => {
+    try {
+      const existingBookmark = findBookmarkForResult(result)
+
+      if (existingBookmark) {
+        await chromeService.removeBookmark(existingBookmark.id)
+      } else if (result.type === 'tab') {
+        const tab = result.data as TabInfo
+        await chromeService.addBookmark(tab.title || tab.url, tab.url)
+      }
+
+      await loadInitialData()
+    } catch (error) {
+      console.error('Error toggling bookmark:', error)
+    }
+  }
+
   return (
     <div className="search-interface">
       <div className="search-header">
@@ -129,10 +155,9 @@ export function SearchInterface() {
           placeholder="Search tabs and bookmarks..."
           isLoading={isLoading}
           onRefresh={handleRefresh}
+          statsLabel={`${tabs.length}T / ${bookmarks.length}B`}
+          statsTitle={`${tabs.length} tabs, ${bookmarks.length} bookmarks`}
         />
-        <div className="search-stats">
-          {tabs.length} tabs, {bookmarks.length} bookmarks
-        </div>
       </div>
       
       <SearchResults
@@ -141,6 +166,8 @@ export function SearchInterface() {
         onSelectResult={handleSelectResult}
         onCloseTab={handleCloseTab}
         onCloseMultipleTabs={handleCloseMultipleTabs}
+        onToggleBookmark={handleToggleBookmark}
+        isBookmarked={(result) => Boolean(findBookmarkForResult(result))}
         query={query}
       />
     </div>
